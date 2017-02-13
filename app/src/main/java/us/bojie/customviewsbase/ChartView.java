@@ -21,7 +21,6 @@ public class ChartView extends View {
 
     public ChartView(Context context, int resId) {
         super(context);
-        setBackgroundColor(Color.RED);
         InputStream inputStream = getResources().openRawResource(resId);
         mDatas = CSVParser.read(inputStream);
         mPaint.setColor(Color.GREEN);
@@ -32,6 +31,14 @@ public class ChartView extends View {
         super.onDraw(canvas);
         mWidth = canvas.getWidth();
         mHeight = canvas.getHeight();
-        canvas.drawRect(0, mHeight / 2, mWidth, mHeight, mPaint);
+        float reactWidth = mWidth / mDatas.size();
+        float left = 0;
+
+        for (int i = mDatas.size() - 1; i >= 0; i--) {
+            StockData stockData = mDatas.get(i);
+            canvas.drawRect(left, mHeight - stockData.high, left + reactWidth,
+                    mHeight - stockData.low, mPaint);
+            left += reactWidth;
+        }
     }
 }
