@@ -16,6 +16,7 @@ import java.util.List;
 public class ChartView extends View {
 
     List<StockData> mDatas;
+    List<StockData> mSubSet;
     float mWidth, mHeight;
     Paint mPaint = new Paint();
 
@@ -24,6 +25,7 @@ public class ChartView extends View {
         InputStream inputStream = getResources().openRawResource(resId);
         mDatas = CSVParser.read(inputStream);
         mPaint.setColor(Color.GREEN);
+        mSubSet = mDatas;
     }
 
     @Override
@@ -31,14 +33,23 @@ public class ChartView extends View {
         super.onDraw(canvas);
         mWidth = canvas.getWidth();
         mHeight = canvas.getHeight();
-        float reactWidth = mWidth / mDatas.size();
+        float reactWidth = mWidth / mSubSet.size();
         float left = 0;
 
-        for (int i = mDatas.size() - 1; i >= 0; i--) {
-            StockData stockData = mDatas.get(i);
+        for (int i = mSubSet.size() - 1; i >= 0; i--) {
+            StockData stockData = mSubSet.get(i);
             canvas.drawRect(left, mHeight - stockData.high, left + reactWidth,
                     mHeight - stockData.low, mPaint);
             left += reactWidth;
         }
+    }
+
+    public void showLast(int n) {
+        mSubSet = mDatas.subList(0, n);
+        invalidate();
+    }
+
+    public void showLast() {
+        showLast(mDatas.size());
     }
 }
