@@ -19,12 +19,13 @@ public class ChartView extends View {
     List<StockData> mSubSet;
     float mWidth, mHeight, mMaxPrice, mMinPrice;
     Paint mPaint = new Paint();
+    Paint mStrokePaint = new Paint();
 
     public ChartView(Context context, int resId) {
         super(context);
         InputStream inputStream = getResources().openRawResource(resId);
         mDatas = CSVParser.read(inputStream);
-        mPaint.setColor(Color.GREEN);
+        mStrokePaint.setColor(Color.WHITE);
         showLast();
     }
 
@@ -34,12 +35,25 @@ public class ChartView extends View {
         mWidth = canvas.getWidth();
         mHeight = canvas.getHeight();
         float reactWidth = mWidth / mSubSet.size();
+        mStrokePaint.setStrokeWidth(reactWidth / 8);
         float left = 0;
+        float bottom, top;
 
         for (int i = mSubSet.size() - 1; i >= 0; i--) {
             StockData stockData = mSubSet.get(i);
-            canvas.drawRect(left, getYPosition(stockData.high), left + reactWidth,
-                    getYPosition(stockData.low), mPaint);
+            if (stockData.close >= stockData.open) {
+                mPaint.setColor(Color.GREEN);
+                top = stockData.close;
+                bottom = stockData.open;
+            } else {
+                mPaint.setColor(Color.RED);
+                top = stockData.open;
+                bottom = stockData.close;
+            }
+            canvas.drawLine(left + reactWidth / 2, getYPosition(stockData.high),
+                    left + reactWidth / 2, getYPosition(stockData.low), mStrokePaint);
+            canvas.drawRect(left, getYPosition(top), left + reactWidth,
+                    getYPosition(bottom), mPaint);
             left += reactWidth;
         }
     }
