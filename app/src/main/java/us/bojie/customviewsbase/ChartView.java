@@ -1,10 +1,12 @@
 package us.bojie.customviewsbase;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.util.AttributeSet;
 import android.view.View;
 
 import java.io.InputStream;
@@ -25,8 +27,12 @@ public class ChartView extends View {
     float mTextHeight;
     Rect mTextBounds = new Rect();
 
-    public ChartView(Context context, int resId) {
-        super(context);
+    public ChartView(Context context, AttributeSet attributeSet) {
+        super(context, attributeSet);
+        TypedArray typedArray = context.getTheme().obtainStyledAttributes(
+                attributeSet, R.styleable.ChartView, 0, 0);
+        int resId = typedArray.getResourceId(R.styleable.ChartView_data, 0);
+        typedArray.recycle();
         InputStream inputStream = getResources().openRawResource(resId);
         mDatas = CSVParser.read(inputStream);
         showLast();

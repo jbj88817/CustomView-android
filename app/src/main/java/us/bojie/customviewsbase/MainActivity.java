@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.RelativeLayout;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -20,9 +19,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mChartView = new ChartView(this, R.raw.goog);
-        RelativeLayout relativeLayout = (RelativeLayout) findViewById(R.id.activity_main);
-        relativeLayout.addView(mChartView);
+        mChartView = (ChartView) findViewById(R.id.chartView);
     }
 
     @Override
