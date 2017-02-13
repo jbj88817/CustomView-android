@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Rect;
 import android.view.View;
 
 import java.io.InputStream;
@@ -20,13 +21,21 @@ public class ChartView extends View {
     float mWidth, mHeight, mMaxPrice, mMinPrice;
     Paint mPaint = new Paint();
     Paint mStrokePaint = new Paint();
+    Paint mTextPaint = new Paint();
+    float mTextHeight;
+    Rect mTextBounds = new Rect();
 
     public ChartView(Context context, int resId) {
         super(context);
         InputStream inputStream = getResources().openRawResource(resId);
         mDatas = CSVParser.read(inputStream);
-        mStrokePaint.setColor(Color.WHITE);
         showLast();
+        mStrokePaint.setColor(Color.WHITE);
+        mTextPaint.setColor(Color.WHITE);
+        mTextPaint.setTextSize(40f);
+        mTextPaint.setTextAlign(Paint.Align.RIGHT);
+        mTextPaint.getTextBounds("0", 0, 1, mTextBounds);
+        mTextHeight = mTextBounds.height();
     }
 
     @Override
@@ -34,7 +43,8 @@ public class ChartView extends View {
         super.onDraw(canvas);
         mWidth = canvas.getWidth();
         mHeight = canvas.getHeight();
-        float reactWidth = mWidth / mSubSet.size();
+        float chartWidth = mWidth - mTextPaint.measureText("1000");
+        float reactWidth = chartWidth / mSubSet.size();
         mStrokePaint.setStrokeWidth(reactWidth / 8);
         float left = 0;
         float bottom, top;
@@ -55,6 +65,14 @@ public class ChartView extends View {
             canvas.drawRect(left, getYPosition(top), left + reactWidth,
                     getYPosition(bottom), mPaint);
             left += reactWidth;
+        }
+
+        for (int i = (int) mMinPrice; i < mMaxPrice; i++) {
+            if (i % 20 == 0) {
+                mStrokePaint.setStrokeWidth(1);
+                canvas.drawLine(0, getYPosition(i), chartWidth, getYPosition(i), mStrokePaint);
+                canvas.drawText(i + "", mWidth, getYPosition(i) + mTextHeight / 2, mTextPaint);
+            }
         }
     }
 
