@@ -17,7 +17,7 @@ public class ChartView extends View {
 
     List<StockData> mDatas;
     List<StockData> mSubSet;
-    float mWidth, mHeight;
+    float mWidth, mHeight, mMaxPrice, mMinPrice;
     Paint mPaint = new Paint();
 
     public ChartView(Context context, int resId) {
@@ -25,7 +25,7 @@ public class ChartView extends View {
         InputStream inputStream = getResources().openRawResource(resId);
         mDatas = CSVParser.read(inputStream);
         mPaint.setColor(Color.GREEN);
-        mSubSet = mDatas;
+        showLast();
     }
 
     @Override
@@ -38,15 +38,34 @@ public class ChartView extends View {
 
         for (int i = mSubSet.size() - 1; i >= 0; i--) {
             StockData stockData = mSubSet.get(i);
-            canvas.drawRect(left, mHeight - stockData.high, left + reactWidth,
-                    mHeight - stockData.low, mPaint);
+            canvas.drawRect(left, getYPosition(stockData.high), left + reactWidth,
+                    getYPosition(stockData.low), mPaint);
             left += reactWidth;
         }
     }
 
+    private float getYPosition(float price) {
+        float scaleFactorY = (price - mMinPrice) / (mMaxPrice - mMinPrice);
+        return mHeight - mHeight * scaleFactorY;
+    }
+
     public void showLast(int n) {
         mSubSet = mDatas.subList(0, n);
+        updateMaxAndMin();
         invalidate();
+    }
+
+    private void updateMaxAndMin() {
+        mMaxPrice = -1f;
+        mMinPrice = 99999f;
+        for (StockData stockData : mSubSet) {
+            if (stockData.high > mMaxPrice) {
+                mMaxPrice = stockData.high;
+            }
+            if (stockData.low < mMinPrice) {
+                mMinPrice = stockData.low;
+            }
+        }
     }
 
     public void showLast() {
